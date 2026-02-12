@@ -7,7 +7,7 @@ const formidable = require('formidable');
 
 const server = http.createServer((req, res) => {
 
-    // ===== FILE UPLOAD ROUTE =====
+   
         if (req.method === 'POST' && req.url === '/upload') {
 
     const uploadDir = path.join(process.cwd(), 'uploads');
@@ -30,22 +30,26 @@ const server = http.createServer((req, res) => {
     });
 
     form.parse(req, (err, fields, files) => {
-        if (err) {
-            console.error("Upload error:", err);
-            res.writeHead(500);
-            res.end("Upload failed");
-            return;
-        }
+    if (err) {
+        console.error("Upload error:", err);
+        res.writeHead(500);
+        res.end("Upload failed");
+        return;
+    }
 
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end('<h1>File Uploaded Successfully</h1><a href="/">Go Back</a>');
+    
+    res.writeHead(302, {
+            Location: '/?success=true'
+        });
+        res.end();
     });
+
 
     return;
 }
 
 
-    // ===== STATIC FILE SERVING =====
+    
     let filePath = path.join(__dirname, 'public',
         req.url === '/' ? 'index.html' : req.url
     );

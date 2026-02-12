@@ -10,12 +10,27 @@
     <div class="container">
         <h1>Hello, World!</h1>
         <p>Your server is running successfully.</p>
-        <h2>Upload File</h2>
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="file" name="filetoupload" required>
-                <button type="submit">Upload</button>
-            </form>
 
+        <div id="message"></div>
+
+
+        <h2>Upload File</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="filetoupload" required>
+            <button type="submit">Upload</button>
+        </form>
     </div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const messageDiv = document.getElementById("message");
+
+    if (params.get("success") === "true") {
+        messageDiv.innerHTML = "<p class='success'>File uploaded successfully!</p>";
+
+        window.history.replaceState({}, document.title, "/");
+    }
+</script>
+
 </body>
 </html>        
