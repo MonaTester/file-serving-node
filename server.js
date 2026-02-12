@@ -4,45 +4,56 @@ const path = require('path');
 const mime = require('mime-types');
 const formidable = require('formidable');
 
+
 const server = http.createServer((req, res) => {
 
-    // Handle File Upload
-    if (req.method === 'POST' && req.url === '/upload') {
-        const form = formidable({
-            uploadDir: path.join(__dirname, 'uploads'),
-            keepExtensions: true
-        });
+    // ===== FILE UPLOAD ROUTE =====
+        if (req.method === 'POST' && req.url === '/upload') {
 
-        if (!fs.existsSync('./uploads')) {
-            fs.mkdirSync('./uploads');
+    const uploadDir = path.join(process.cwd(), 'uploads');
+
+    try {
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
         }
-
-        form.parse(req, (err, fields, files) => {
-            if (err) {
-                res.writeHead(500);
-                res.end('Upload Error');
-                return;
-            }
-
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end('<h2>File Uploaded Successfully</h2>');
-        });
-
+    } catch (err) {
+        console.error("Directory creation failed:", err);
+        res.writeHead(500);
+        res.end("Server error creating upload directory");
         return;
     }
 
-    // Static File Serving
-    let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+    const form = new formidable.IncomingForm({
+        uploadDir: uploadDir,
+        keepExtensions: true,
+        multiples: false
+    });
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            console.error("Upload error:", err);
+            res.writeHead(500);
+            res.end("Upload failed");
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end('<h1>File Uploaded Successfully</h1><a href="/">Go Back</a>');
+    });
+
+    return;
+}
+
+
+    // ===== STATIC FILE SERVING =====
+    let filePath = path.join(__dirname, 'public',
+        req.url === '/' ? 'index.html' : req.url
+    );
 
     fs.readFile(filePath, (err, content) => {
         if (err) {
-            if (err.code === 'ENOENT') {
-                res.writeHead(404, { 'Content-Type': 'text/html' });
-                res.end('<h1>404 - File Not Found</h1>');
-            } else {
-                res.writeHead(500);
-                res.end(`Server Error: ${err.code}`);
-            }
+            res.writeHead(404);
+            res.end('404 Not Found');
         } else {
             res.writeHead(200, {
                 'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
