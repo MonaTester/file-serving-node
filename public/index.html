@@ -10,6 +10,12 @@
     <div class="container">
         <h1>Hello, World!</h1>
         <p>Your server is running successfully.</p>
+        <h2>Upload File</h2>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="filetoupload" required>
+                <button type="submit">Upload</button>
+            </form>
+
     </div>
 </body>
 </html>        
