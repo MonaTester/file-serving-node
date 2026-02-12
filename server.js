@@ -50,9 +50,14 @@ const server = http.createServer((req, res) => {
 
 
     
-    let filePath = path.join(__dirname, 'public',
-        req.url === '/' ? 'index.html' : req.url
+   const urlPath = req.url.split('?')[0];
+
+    let filePath = path.join(
+        __dirname,
+        'public',
+        urlPath === '/' ? 'index.html' : urlPath
     );
+
 
     fs.readFile(filePath, (err, content) => {
         if (err) {
